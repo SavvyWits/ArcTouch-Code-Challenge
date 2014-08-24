@@ -1,11 +1,7 @@
 package com.richdudka.arctouchchallenge;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -19,6 +15,7 @@ import org.json.JSONObject;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Base64;
 import android.util.Log;
 
@@ -26,7 +23,6 @@ public class MainIntentService extends IntentService
 {
 	private static final String USERNAME = "WKD4N7YMA1uiM8V";
 	private static final String PASSWORD = "DtdTtzMLQlA0hk2C1Yi5pLyVIlAQ68";
-	private static final String CUSTOM_HEADER ="X-AppGlu-Environment: staging";
 	private static final String ROUTES_URL = "https://api.appglu.com/v1/queries/findRoutesByStopName/run";
 	
 	public MainIntentService()
@@ -62,11 +58,9 @@ public class MainIntentService extends IntentService
 		try {
 			HttpResponse response = client.execute(post);
 			String entity = EntityUtils.toString(response.getEntity());
-			Writer output = null;
-			File file = new File("stops.txt");
-			output = new BufferedWriter(new FileWriter(file));
-			output.write(entity);
-			output.close();
+			SharedPreferences.Editor prefEditor = getSharedPreferences("stopsData", 0).edit();
+			prefEditor.putString("json", entity);
+			prefEditor.commit();
 			Log.v("JSON REST RESPONSE", entity);
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
