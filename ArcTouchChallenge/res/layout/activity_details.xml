@@ -11,14 +11,27 @@
         android:id="@+id/detailsStopName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
         android:gravity="center_horizontal"
+        android:textSize="@dimen/text_size" />
+
+    <Button
+        android:id="@+id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="mainClickHandler"
+        android:text="@string/back"
         android:textSize="@dimen/text_size" />
 
     <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/detailsStopName" >
+        android:layout_below="@id/detailsStopName"
+        android:layout_above="@id/back" >
     </ListView>
 
     <ProgressBar

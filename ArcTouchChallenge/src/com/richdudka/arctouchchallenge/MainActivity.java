@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -21,7 +22,7 @@ public class MainActivity extends ListActivity implements MainResultReceiver.Rec
 
 	String ids;
 	String longNames;
-	
+
 	MainResultReceiver receiver;
 
 	@Override
@@ -31,6 +32,21 @@ public class MainActivity extends ListActivity implements MainResultReceiver.Rec
 
 		receiver = new MainResultReceiver(new Handler());
 		receiver.setReceiver(this);
+
+		Intent intent = getIntent();
+		if (intent.hasExtra("ids"))
+		{
+			TextView routesTitle = (TextView) findViewById(R.id.routesTitle);
+			routesTitle.setVisibility(View.VISIBLE);
+			ids = intent.getStringExtra("ids");
+			longNames = intent.getStringExtra("longNames");
+			String[] result = longNames.split(";");
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+					android.R.layout.simple_list_item_1, result);
+			setListAdapter(adapter);
+
+			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);		
+		}
 	}
 
 	public void mainClickHandler(View v)
@@ -43,11 +59,11 @@ public class MainActivity extends ListActivity implements MainResultReceiver.Rec
 		intent.putExtra("requestData", data);
 		intent.putExtra("requestType", "list");
 		startService(intent);
-		
+
 		InputMethodManager inputManager = (InputMethodManager)
-                getSystemService(Context.INPUT_METHOD_SERVICE);
+				getSystemService(Context.INPUT_METHOD_SERVICE);
 		inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                   InputMethodManager.HIDE_NOT_ALWAYS);
+				InputMethodManager.HIDE_NOT_ALWAYS);
 	}
 
 	@Override
@@ -76,7 +92,7 @@ public class MainActivity extends ListActivity implements MainResultReceiver.Rec
 			break;
 		}
 	}
-	
+
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id)
 	{
@@ -85,6 +101,8 @@ public class MainActivity extends ListActivity implements MainResultReceiver.Rec
 		String idNumber = ids.split(";")[position];
 		intent.putExtra("stopName", stopName);
 		intent.putExtra("id", idNumber);
+		intent.putExtra("ids", ids);
+		intent.putExtra("longNames", longNames);
 		startActivity(intent);
 	}
 }

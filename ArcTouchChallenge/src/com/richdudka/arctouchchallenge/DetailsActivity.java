@@ -4,6 +4,7 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
@@ -12,6 +13,9 @@ public class DetailsActivity extends ListActivity implements MainResultReceiver.
 	static final int RUNNING = 1;
 	static final int FINISHED = 2;
 	static final int ERROR = 3;
+	
+	String ids;
+	String longNames;
 	
 	MainResultReceiver receiver;
 	
@@ -29,6 +33,8 @@ public class DetailsActivity extends ListActivity implements MainResultReceiver.
 		TextView detailsStopName = (TextView) findViewById(R.id.detailsStopName);
 		detailsStopName.setText(stopName);
 		String data = incomingIntent.getStringExtra("id");
+		ids = incomingIntent.getStringExtra("ids");
+		longNames = incomingIntent.getStringExtra("longNames");
 		
 		Intent outgoingIntent = new Intent(this, DetailsIntentService.class);
 		outgoingIntent.putExtra("receiver", receiver);
@@ -38,13 +44,11 @@ public class DetailsActivity extends ListActivity implements MainResultReceiver.
 	}
 
 	@Override
-	public void onReceiveResult(int resultCode, Bundle resultData) {
+	public void onReceiveResult(int resultCode, Bundle resultData)
+	{
 		switch(resultCode)
 		{
 		case RUNNING:
-			/*
-			 * TODO: Show progress wheel
-			 */
 			break;
 		case FINISHED:
 			String details = resultData.getString("details");
@@ -56,5 +60,13 @@ public class DetailsActivity extends ListActivity implements MainResultReceiver.
 		case ERROR:
 			break;
 		}
+	}
+	
+	public void mainClickHandler(View v)
+	{
+		Intent intent = new Intent(this, MainActivity.class);
+		intent.putExtra("ids", ids);
+		intent.putExtra("longNames", longNames);
+		startActivity(intent);
 	}
 }
