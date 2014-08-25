@@ -19,7 +19,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Base64;
-import android.util.Log;
 
 public class DetailsIntentService extends IntentService
 {
@@ -76,7 +75,6 @@ public class DetailsIntentService extends IntentService
 		try {
 			HttpResponse response = client.execute(stopsPost);
 			String json = EntityUtils.toString(response.getEntity());
-			Log.v("STOPS", json);
 			if (!validateJSON(json)) {
 				receiver.send(STATUS_ERROR, Bundle.EMPTY);
 			} else {
@@ -118,7 +116,6 @@ public class DetailsIntentService extends IntentService
 		try {
 			HttpResponse response = client.execute(detailsPost);
 			String json = EntityUtils.toString(response.getEntity());
-			Log.v("DEPARTURES", json);
 			if (!validateJSON(json)) {
 				receiver.send(STATUS_ERROR, Bundle.EMPTY);
 			} else {
@@ -138,7 +135,7 @@ public class DetailsIntentService extends IntentService
 						e.printStackTrace();
 					}
 				}
-				String detailsString = stopNames + "Weekday Departures;" + weekdayTimes + ";Saturday Departures;" + saturdayTimes
+				String detailsString = "Stop Names;" + stopNames + "Weekday Departures;" + weekdayTimes + ";Saturday Departures;" + saturdayTimes
 						+ ";Sunday Departures;" + sundayTimes;
 				Bundle bundle = new Bundle();
 				bundle.putString("details", detailsString);
@@ -156,9 +153,10 @@ public class DetailsIntentService extends IntentService
 		}
 	}
 
-boolean validateJSON(String string) {
-	return string != null && ("null".equals(string)
-			|| (string.startsWith("[") && string.endsWith("]"))
-			|| (string.startsWith("{") && string.endsWith("}")));
-}
+	boolean validateJSON(String string)
+	{
+		return string != null && ("null".equals(string)
+				|| (string.startsWith("[") && string.endsWith("]"))
+				|| (string.startsWith("{") && string.endsWith("}")));
+	}
 }

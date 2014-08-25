@@ -9,6 +9,15 @@
     android:paddingTop="@dimen/vertical_margin"
     tools:context="com.richdudka.arctouchchallenge.MainActivity" >
 
+    <TextView
+        android:id="@+id/routesTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/routes"
+        android:textSize="@dimen/text_size"
+        android:visibility="gone" />
+
     <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"

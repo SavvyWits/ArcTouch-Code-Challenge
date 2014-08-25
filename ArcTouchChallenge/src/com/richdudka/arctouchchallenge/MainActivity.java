@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 public class MainActivity extends ListActivity implements MainResultReceiver.Receiver
 {
@@ -62,6 +63,8 @@ public class MainActivity extends ListActivity implements MainResultReceiver.Rec
 			/*
 			 * Get the longNames string and send it to the list adapter.
 			 */
+			TextView routesTitle = (TextView) findViewById(R.id.routesTitle);
+			routesTitle.setVisibility(View.VISIBLE);
 			ids = resultData.getString("ids");
 			longNames = resultData.getString("longNames");
 			String[] result = longNames.split(";");

@@ -3,6 +3,7 @@
 
     <string name="app_name">ArcTouchChallenge</string>
     <string name="action_settings">Settings</string>
+    <string name="routes">Routes</string>
     <string name="search_button">Search</string>
     <string name="search_hint">Enter a street name</string>
 
