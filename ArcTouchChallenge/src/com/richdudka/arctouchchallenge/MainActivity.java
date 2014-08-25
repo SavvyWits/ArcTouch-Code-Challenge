@@ -6,11 +6,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 public class MainActivity extends ListActivity implements MainResultReceiver.Receiver
 {
@@ -55,9 +55,8 @@ public class MainActivity extends ListActivity implements MainResultReceiver.Rec
 		switch(resultCode)
 		{
 		case RUNNING:
-			/*
-			 * TODO: Show progress wheel
-			 */
+			ProgressBar pb = (ProgressBar) findViewById(R.id.progress);
+			pb.setVisibility(View.VISIBLE);
 			break;
 		case FINISHED:
 			/*
