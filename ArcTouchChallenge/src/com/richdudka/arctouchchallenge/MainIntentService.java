@@ -38,12 +38,12 @@ public class MainIntentService extends IntentService
 	@Override
 	protected void onHandleIntent(Intent intent)
 	{
-		Bundle extras = intent.getExtras();
-		ResultReceiver receiver = extras.getParcelable("receiver");
-		String data = extras.getString("requestData");
+		ResultReceiver receiver = intent.getParcelableExtra("receiver");
+		String data = intent.getStringExtra("requestData");
 
 		receiver.send(STATUS_RUNNING, Bundle.EMPTY);
 
+		// Build the JSON for the POST
 		JSONObject body = new JSONObject();
 		JSONObject params = new JSONObject();
 		try {
@@ -66,6 +66,8 @@ public class MainIntentService extends IntentService
 		post.addHeader("X-AppGlu-Environment", "staging");
 		HttpClient client = new DefaultHttpClient();
 		try {
+			// Get the REST JSON, parse it into semicolon delimited strings,
+			// and send it to MainActivity
 			HttpResponse response = client.execute(post);
 			String json = EntityUtils.toString(response.getEntity());
 			if (!validateJSON(json)) {

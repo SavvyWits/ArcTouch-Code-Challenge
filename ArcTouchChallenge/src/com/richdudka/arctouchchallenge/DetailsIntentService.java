@@ -39,9 +39,10 @@ public class DetailsIntentService extends IntentService
 	@Override
 	protected void onHandleIntent(Intent intent)
 	{
-		Bundle extras = intent.getExtras();
-		ResultReceiver receiver = extras.getParcelable("receiver");
-		String data = extras.getString("requestData");
+		// Get the REST results and build semicolon delimited strings
+		// Two network requests get made here
+		ResultReceiver receiver = intent.getParcelableExtra("receiver");
+		String data = intent.getStringExtra("requestData");
 		int id = Integer.parseInt(data);
 
 		receiver.send(STATUS_RUNNING, Bundle.EMPTY);
@@ -60,6 +61,7 @@ public class DetailsIntentService extends IntentService
 			e.printStackTrace();
 		}
 
+		// The first network request
 		HttpPost stopsPost = new HttpPost(STOPS_URL);
 		try {
 			stopsPost.setEntity(new StringEntity(body.toString()));
@@ -101,6 +103,7 @@ public class DetailsIntentService extends IntentService
 			e1.printStackTrace();
 		}
 
+		// The second network request
 		HttpPost detailsPost = new HttpPost(DEPARTURES_URL);
 		try {
 			detailsPost.setEntity(new StringEntity(body.toString()));
@@ -135,6 +138,7 @@ public class DetailsIntentService extends IntentService
 						e.printStackTrace();
 					}
 				}
+				// Build one semicolon delimited string and send it to DetailsActivity
 				String detailsString = "Stop Names;" + stopNames + "Weekday Departures;" + weekdayTimes + ";Saturday Departures;" + saturdayTimes
 						+ ";Sunday Departures;" + sundayTimes;
 				Bundle bundle = new Bundle();

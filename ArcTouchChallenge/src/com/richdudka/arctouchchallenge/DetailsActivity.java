@@ -15,7 +15,7 @@ public class DetailsActivity extends ListActivity implements MainResultReceiver.
 	static final int ERROR = 3;
 	
 	String ids;
-	String longNames;
+	String stopNames;
 	
 	MainResultReceiver receiver;
 	
@@ -28,19 +28,35 @@ public class DetailsActivity extends ListActivity implements MainResultReceiver.
 		receiver = new MainResultReceiver(new Handler());
 		receiver.setReceiver(this);
 		
+		// Retrieve the extras from the intent
 		Intent incomingIntent = getIntent();
 		String stopName = incomingIntent.getStringExtra("stopName");
 		TextView detailsStopName = (TextView) findViewById(R.id.detailsStopName);
 		detailsStopName.setText(stopName);
 		String data = incomingIntent.getStringExtra("id");
 		ids = incomingIntent.getStringExtra("ids");
-		longNames = incomingIntent.getStringExtra("longNames");
+		stopNames = incomingIntent.getStringExtra("longNames");
 		
+		// Start the intent service
 		Intent outgoingIntent = new Intent(this, DetailsIntentService.class);
 		outgoingIntent.putExtra("receiver", receiver);
 		outgoingIntent.putExtra("requestData", data);
 		outgoingIntent.putExtra("requestType", "details");
 		startService(outgoingIntent);
+	}
+	
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		receiver.setReceiver(null);
+	}
+	
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		receiver.setReceiver(this);
 	}
 
 	@Override
@@ -64,9 +80,10 @@ public class DetailsActivity extends ListActivity implements MainResultReceiver.
 	
 	public void mainClickHandler(View v)
 	{
+		// MainActivity needs these strings in order to properly populate its list
 		Intent intent = new Intent(this, MainActivity.class);
 		intent.putExtra("ids", ids);
-		intent.putExtra("longNames", longNames);
+		intent.putExtra("longNames", stopNames);
 		startActivity(intent);
 	}
 }

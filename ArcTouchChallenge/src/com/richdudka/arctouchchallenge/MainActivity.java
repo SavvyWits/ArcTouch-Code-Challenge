@@ -21,7 +21,7 @@ public class MainActivity extends ListActivity implements MainResultReceiver.Rec
 	static final int ERROR = 3;
 
 	String ids;
-	String longNames;
+	String stopNames;
 
 	MainResultReceiver receiver;
 
@@ -34,32 +34,52 @@ public class MainActivity extends ListActivity implements MainResultReceiver.Rec
 		receiver.setReceiver(this);
 
 		Intent intent = getIntent();
+		// This runs if the DetailsActivity back button sent the intent
+		// by checking if it has the right extra
 		if (intent.hasExtra("ids"))
 		{
 			TextView routesTitle = (TextView) findViewById(R.id.routesTitle);
 			routesTitle.setVisibility(View.VISIBLE);
 			ids = intent.getStringExtra("ids");
-			longNames = intent.getStringExtra("longNames");
-			String[] result = longNames.split(";");
+			stopNames = intent.getStringExtra("longNames");
+			String[] result = stopNames.split(";");
 			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
 					android.R.layout.simple_list_item_1, result);
 			setListAdapter(adapter);
 
+			// No need to show the keyboard since the list will be populated
 			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);		
 		}
+	}
+	
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		receiver.setReceiver(null);
+	}
+	
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		receiver.setReceiver(this);
 	}
 
 	public void mainClickHandler(View v)
 	{
+		// Get the search term and surround it with wild cards
 		EditText search = (EditText) findViewById(R.id.searchBox);
 		String data = "%" + search.getText().toString() + "%";
 
+		// Start the intent service
 		Intent intent = new Intent(this, MainIntentService.class);
 		intent.putExtra("receiver", receiver);
 		intent.putExtra("requestData", data);
 		intent.putExtra("requestType", "list");
 		startService(intent);
 
+		// We no longer need the keyboard
 		InputMethodManager inputManager = (InputMethodManager)
 				getSystemService(Context.INPUT_METHOD_SERVICE);
 		inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
@@ -72,23 +92,24 @@ public class MainActivity extends ListActivity implements MainResultReceiver.Rec
 		switch(resultCode)
 		{
 		case RUNNING:
+			// Show a progress while retrieving the search results
 			ProgressBar pb = (ProgressBar) findViewById(R.id.progress);
 			pb.setVisibility(View.VISIBLE);
 			break;
 		case FINISHED:
-			/*
-			 * Get the longNames string and send it to the list adapter.
-			 */
+			// Get the ids string and save it for future use
+			// Get the longNames string and send it to the list adapter.
 			TextView routesTitle = (TextView) findViewById(R.id.routesTitle);
 			routesTitle.setVisibility(View.VISIBLE);
 			ids = resultData.getString("ids");
-			longNames = resultData.getString("longNames");
-			String[] result = longNames.split(";");
+			stopNames = resultData.getString("longNames");
+			String[] result = stopNames.split(";");
 			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
 					android.R.layout.simple_list_item_1, result);
 			setListAdapter(adapter);
 			break;
 		case ERROR:
+			// TODO: Error handling i.e. dialog
 			break;
 		}
 	}
@@ -96,13 +117,16 @@ public class MainActivity extends ListActivity implements MainResultReceiver.Rec
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id)
 	{
+		// DetailsActivity needs the clicked position details
+		// and the full ids and stopNames strings in case its
+		// Back button is pressed
 		Intent intent = new Intent(this, DetailsActivity.class);
-		String stopName = longNames.split(";")[position];
+		String stopName = stopNames.split(";")[position];
 		String idNumber = ids.split(";")[position];
 		intent.putExtra("stopName", stopName);
 		intent.putExtra("id", idNumber);
 		intent.putExtra("ids", ids);
-		intent.putExtra("longNames", longNames);
+		intent.putExtra("longNames", stopNames);
 		startActivity(intent);
 	}
 }
