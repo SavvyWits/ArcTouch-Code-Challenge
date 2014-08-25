@@ -19,23 +19,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Base64;
-import android.util.Log;
 
 public class MainIntentService extends IntentService
 {
 	static final String USERNAME = "WKD4N7YMA1uiM8V";
 	static final String PASSWORD = "DtdTtzMLQlA0hk2C1Yi5pLyVIlAQ68";
 	static final String ROUTES_URL = "https://api.appglu.com/v1/queries/findRoutesByStopName/run";
-	static final String STOPS_URL = "https://api.appglu.com/v1/queries/findStopsByRouteId/run";
-	static final String DEPARTURES_URL = "https://api.appglu.com/v1/queries/findDeparturesByRouteId/run";
 
 	static final int STATUS_RUNNING = 1;
 	static final int STATUS_FINISHED = 2;
 	static final int STATUS_ERROR = 3;
-
-	int id;
-
-	HttpPost post;
 
 	public MainIntentService()
 	{
@@ -47,30 +40,20 @@ public class MainIntentService extends IntentService
 	{
 		Bundle extras = intent.getExtras();
 		ResultReceiver receiver = extras.getParcelable("receiver");
-		String type = extras.getString("requestType");
 		String data = extras.getString("requestData");
-
-		if (type.equalsIgnoreCase("details"))
-			id = Integer.parseInt(data);
 
 		receiver.send(STATUS_RUNNING, Bundle.EMPTY);
 
 		JSONObject body = new JSONObject();
 		JSONObject params = new JSONObject();
 		try {
-			if (type.equalsIgnoreCase("list"))
-				params.put("stopName", data);
-			else
-				params.put("routeId", id);
+			params.put("stopName", data);
 			body.put("params", params);
-			Log.v("JSON OBJECT", body.toString());
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		if (type.equalsIgnoreCase("list"))
-			post = new HttpPost(ROUTES_URL);
-		else
-			post = new HttpPost(STOPS_URL);
+
+		HttpPost post = new HttpPost(ROUTES_URL);
 		try {
 			post.setEntity(new StringEntity(body.toString()));
 		} catch (UnsupportedEncodingException e1) {
@@ -90,30 +73,23 @@ public class MainIntentService extends IntentService
 			} else {
 				Bundle bundle = new Bundle();
 				JSONObject entity = new JSONObject(json);
-				if (type.equalsIgnoreCase("list"))
+				String ids = "";
+				String longNames = "";
+				JSONArray jArray = entity.getJSONArray("rows");
+				for (int i=0; i<jArray.length(); i++)
 				{
-					String ids = "";
-					String shortNames = "";
-					String longNames = "";
-					JSONArray jArray = entity.getJSONArray("rows");
-					for (int i=0; i<jArray.length(); i++)
-					{
-						try {
-							JSONObject object = jArray.getJSONObject(i);
-							ids = ids + object.getInt("id") + ";";
-							shortNames = shortNames + object.getLong("shortName") + ";";
-							longNames = longNames + object.getString("longName") + ";";
-							bundle.putString("ids", ids);
-							bundle.putString("shortNames", shortNames);
-							bundle.putString("longNames", longNames);
-						} catch (JSONException e) {
-							e.printStackTrace();
-						}
+					try {
+						JSONObject object = jArray.getJSONObject(i);
+						ids = ids + object.getInt("id") + ";";
+						longNames = longNames + object.getString("longName") + ";";
+						bundle.putString("ids", ids);
+						bundle.putString("longNames", longNames);
+					} catch (JSONException e) {
+						e.printStackTrace();
 					}
 				}
 				receiver.send(STATUS_FINISHED, bundle);
 			}
-			Log.v("JSON REST RESPONSE", json);
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -126,7 +102,7 @@ public class MainIntentService extends IntentService
 		}
 	}
 
-	static boolean validateJSON(String string) {
+	boolean validateJSON(String string) {
 		return string != null && ("null".equals(string)
 				|| (string.startsWith("[") && string.endsWith("]"))
 				|| (string.startsWith("{") && string.endsWith("}")));

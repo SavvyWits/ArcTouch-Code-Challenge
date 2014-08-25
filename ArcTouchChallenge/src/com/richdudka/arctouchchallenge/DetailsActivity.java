@@ -1,12 +1,13 @@
 package com.richdudka.arctouchchallenge;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
-public class DetailsActivity extends Activity implements MainResultReceiver.Receiver
+public class DetailsActivity extends ListActivity implements MainResultReceiver.Receiver
 {
 	static final int RUNNING = 1;
 	static final int FINISHED = 2;
@@ -24,14 +25,16 @@ public class DetailsActivity extends Activity implements MainResultReceiver.Rece
 		receiver.setReceiver(this);
 		
 		Intent incomingIntent = getIntent();
+		String stopName = incomingIntent.getStringExtra("stopName");
+		TextView detailsStopName = (TextView) findViewById(R.id.detailsStopName);
+		detailsStopName.setText(stopName);
 		String data = incomingIntent.getStringExtra("id");
 		
-		Log.v("DETAILS_ID", data);
-		
-		Intent outgoingIntent = new Intent(this, MainIntentService.class);
+		Intent outgoingIntent = new Intent(this, DetailsIntentService.class);
 		outgoingIntent.putExtra("receiver", receiver);
 		outgoingIntent.putExtra("requestData", data);
 		outgoingIntent.putExtra("requestType", "details");
+		startService(outgoingIntent);
 	}
 
 	@Override
@@ -44,6 +47,23 @@ public class DetailsActivity extends Activity implements MainResultReceiver.Rece
 			 */
 			break;
 		case FINISHED:
+			String stopNames = resultData.getString("stopNames");
+			String[] result = stopNames.split(";");
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+					android.R.layout.simple_list_item_1, result);
+			setListAdapter(adapter);
+			
+			String weekdayTimes = resultData.getString("weekdayTimes");
+			TextView weekday = (TextView) findViewById(R.id.weekdayTimes);
+			weekday.setText(weekdayTimes);
+			
+			String saturdayTimes = resultData.getString("saturdayTimes");
+			TextView saturday = (TextView) findViewById(R.id.saturdayTimes);
+			saturday.setText(saturdayTimes);
+			
+			String sundayTimes = resultData.getString("sundayTimes");
+			TextView sunday = (TextView) findViewById(R.id.sundayTimes);
+			sunday.setText(sundayTimes);
 			break;
 		case ERROR:
 			break;

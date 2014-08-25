@@ -32,6 +32,10 @@
             android:name=".MainIntentService"
             android:exported="false" >
         </service>
+        <service
+            android:name=".DetailsIntentService"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>
