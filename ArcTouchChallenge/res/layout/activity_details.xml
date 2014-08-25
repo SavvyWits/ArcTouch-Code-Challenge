@@ -20,22 +20,4 @@
         android:layout_height="wrap_content" >
     </ListView>
 
-    <TextView
-        android:id="@+id/weekdayTimes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/text_size" />
-
-    <TextView
-        android:id="@+id/saturdayTimes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/text_size" />
-
-    <TextView
-        android:id="@+id/sundayTimes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/text_size" />
-
 </LinearLayout>

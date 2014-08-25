@@ -47,6 +47,11 @@ public class DetailsIntentService extends IntentService
 
 		receiver.send(STATUS_RUNNING, Bundle.EMPTY);
 
+		String stopNames = "";
+		String weekdayTimes = "";
+		String saturdayTimes = "";
+		String sundayTimes = "";
+
 		JSONObject body = new JSONObject();
 		JSONObject params = new JSONObject();
 		try {
@@ -55,8 +60,6 @@ public class DetailsIntentService extends IntentService
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
-		Bundle bundle = new Bundle();
 
 		HttpPost stopsPost = new HttpPost(STOPS_URL);
 		try {
@@ -78,15 +81,12 @@ public class DetailsIntentService extends IntentService
 				receiver.send(STATUS_ERROR, Bundle.EMPTY);
 			} else {
 				JSONObject entity = new JSONObject(json);
-				String stopNames = "";
 				JSONArray jArray = entity.getJSONArray("rows");
 				for (int i=0; i<jArray.length(); i++)
 				{
 					try {
 						JSONObject object = jArray.getJSONObject(i);
 						stopNames = stopNames + object.getString("name") + ";";
-						bundle.putString("stopNames", stopNames);
-						Log.v("STOP NAMES", stopNames);
 					} catch (JSONException e) {
 						e.printStackTrace();
 					}
@@ -123,9 +123,6 @@ public class DetailsIntentService extends IntentService
 				receiver.send(STATUS_ERROR, Bundle.EMPTY);
 			} else {
 				JSONObject entity = new JSONObject(json);
-				String weekdayTimes = "";
-				String saturdayTimes = "";
-				String sundayTimes = "";
 				JSONArray jArray = entity.getJSONArray("rows");
 				for (int i=0; i<jArray.length(); i++)
 				{
@@ -136,17 +133,15 @@ public class DetailsIntentService extends IntentService
 						else if (object.getString("calendar").equalsIgnoreCase("saturday"))
 							saturdayTimes = saturdayTimes + object.getString("time") + " ";
 						else
-							sundayTimes = sundayTimes + object.getString("time");
-						bundle.putString("weekdayTimes", weekdayTimes);
-						bundle.putString("saturdayTimes", saturdayTimes);
-						bundle.putString("sundayTimes", sundayTimes);
-						Log.v("WEEKDAY TIMES", weekdayTimes);
-						Log.v("SATURDAY TIMES", saturdayTimes);
-						Log.v("SUNDAY TIMES", sundayTimes);
+							sundayTimes = sundayTimes + object.getString("time") + " ";
 					} catch (JSONException e) {
 						e.printStackTrace();
 					}
 				}
+				String detailsString = stopNames + "Weekday Departures;" + weekdayTimes + ";Saturday Departures;" + saturdayTimes
+						+ ";Sunday Departures;" + sundayTimes;
+				Bundle bundle = new Bundle();
+				bundle.putString("details", detailsString);
 				receiver.send(STATUS_FINISHED, bundle);
 			}
 		} catch (ClientProtocolException e) {

@@ -47,23 +47,11 @@ public class DetailsActivity extends ListActivity implements MainResultReceiver.
 			 */
 			break;
 		case FINISHED:
-			String stopNames = resultData.getString("stopNames");
-			String[] result = stopNames.split(";");
+			String details = resultData.getString("details");
+			String[] result = details.split(";");
 			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
 					android.R.layout.simple_list_item_1, result);
 			setListAdapter(adapter);
-			
-			String weekdayTimes = resultData.getString("weekdayTimes");
-			TextView weekday = (TextView) findViewById(R.id.weekdayTimes);
-			weekday.setText(weekdayTimes);
-			
-			String saturdayTimes = resultData.getString("saturdayTimes");
-			TextView saturday = (TextView) findViewById(R.id.saturdayTimes);
-			saturday.setText(saturdayTimes);
-			
-			String sundayTimes = resultData.getString("sundayTimes");
-			TextView sunday = (TextView) findViewById(R.id.sundayTimes);
-			sunday.setText(sundayTimes);
 			break;
 		case ERROR:
 			break;
